@@ -1,6 +1,3 @@
-import { defineStore } from 'pinia'
-import { supabase } from '@/supabase'
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({ user: null, loading: false, error: null }),
   getters: {
