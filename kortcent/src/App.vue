@@ -27,7 +27,6 @@ onMounted(async () => {
 
 <template>
   <ul v-if="todos.length">
-    <p>hi</p>
     <li v-for="todo in todos" :key="todo.id">
       {{ todo.name }}
     </li>
