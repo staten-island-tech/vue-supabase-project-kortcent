@@ -2,17 +2,10 @@
 import { onMounted, ref, computed } from 'vue'
 import { useUmaStore } from '@/stores/umaStore'
 import { useTrainerStore } from '@/stores/trainerStore'
+import TrainerCard from '@/components/TrainerCard.vue'
 
 const umaStore = useUmaStore()
 const trainerStore = useTrainerStore()
-
-const CATEGORIES = [
-  { key: 'sprint', label: 'Sprint' },
-  { key: 'dirt', label: 'Dirt' },
-  { key: 'mile', label: 'Mile' },
-  { key: 'medium', label: 'Medium' },
-  { key: 'long', label: 'Long' }
-]
 
 onMounted(async () => {
   await umaStore.fetchAllUmas()
@@ -58,70 +51,8 @@ function getUma(id) {
 }
 </script>
 
-<template>
-  <div class="party-page">
-    <h1>Party</h1>
-    <p class="subtitle">Build a squad of up to 5 umas for each race distance.</p>
-
-    <div v-if="umaStore.unlockedUmas.length === 0" class="empty">
-      You don't have any unlocked umas yet. Visit the Gacha to recruit some!
-    </div>
-
-    <div v-else class="categories">
-      <section v-for="category in CATEGORIES" :key="category.key" class="category">
-        <h2>{{ category.label }}</h2>
-
-        <div class="slots">
-          <button
-            v-for="(umaId, slotIndex) in trainerStore.party[category.key]"
-            :key="slotIndex"
-            class="slot"
-            :class="{ filled: umaId }"
-            @click="umaId ? clearSlot(category.key, slotIndex) : openPicker(category.key, slotIndex)"
-          >
-            <template v-if="umaId && getUma(umaId)">
-              <img :src="getUma(umaId).image_url" :alt="getUma(umaId).name" class="portrait" />
-              <span class="uma-name">{{ getUma(umaId).name }}</span>
-              <span class="remove-hint">Click to remove</span>
-            </template>
-            <template v-else>
-              <span class="plus">+</span>
-              <span class="add-hint">Add Uma</span>
-            </template>
-          </button>
-        </div>
-      </section>
-    </div>
-
-    <!-- Picker modal -->
-    <div v-if="pickerOpen" class="modal-overlay" @click.self="closePicker">
-      <div class="modal">
-        <header class="modal-header">
-          <h3>Choose an Uma</h3>
-          <button class="close-btn" @click="closePicker">&times;</button>
-        </header>
-
-        <div v-if="pickerOptions.length === 0" class="empty">
-          No available umas to add (all your unlocked umas are already placed in this category).
-        </div>
-
-        <div v-else class="modal-grid">
-          <button
-            v-for="uma in pickerOptions"
-            :key="uma.id"
-            class="modal-option"
-            @click="selectUma(uma.id)"
-          >
-            <img :src="uma.image_url" :alt="uma.name" class="portrait" />
-            <span class="uma-name">{{ uma.name }}</span>
-            <div class="stars">
-              <span v-for="n in 3" :key="n" class="star" :class="{ filled: n <= uma.rarity }">★</span>
-            </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+<template v-if="umaId && getUma(umaId)">
+  <TrainerCard :uma="getUma(umaId)" @remove="clearSlot(category.key, slotIndex)" />
 </template>
 
 <style scoped>
@@ -176,7 +107,9 @@ function getUma(id) {
   font-family: inherit;
   padding: 0.75rem;
   text-align: center;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .slot:hover {

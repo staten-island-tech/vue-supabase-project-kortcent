@@ -140,7 +140,6 @@ async function doTenPull() {
   border: 2px solid #333;
 }
 
-/* Highlight rarity tiers */
 .rarity-3 {
   border-color: gold;
   background: #2a2000;
@@ -189,5 +188,14 @@ async function doTenPull() {
 .loading {
   color: #aaa;
   font-style: italic;
+}
+.uma-name {
+  color: #f5f2ff;
+}
+.running-style {
+  color: #c9c4e8;
+}
+.stars {
+  color: #f1c40f;
 }
 </style>
