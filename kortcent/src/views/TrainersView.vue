@@ -7,13 +7,20 @@ import TrainerCard from '@/components/TrainerCard.vue'
 const umaStore = useUmaStore()
 const trainerStore = useTrainerStore()
 
+const CATEGORIES = [
+  { key: 'sprint', label: 'Sprint' },
+  { key: 'dirt', label: 'Dirt' },
+  { key: 'mile', label: 'Mile' },
+  { key: 'medium', label: 'Medium' },
+  { key: 'long', label: 'Long' },
+]
+
 onMounted(async () => {
   await umaStore.fetchAllUmas()
   await umaStore.fetchUnlockedUmas()
   await trainerStore.fetchParty()
 })
 
-// --- Picker modal state ---
 const pickerOpen = ref(false)
 const activeCategory = ref(null)
 const activeSlotIndex = ref(null)
@@ -30,10 +37,9 @@ function closePicker() {
   activeSlotIndex.value = null
 }
 
-// Umas the player owns that aren't already placed in this category's other slots
 const pickerOptions = computed(() => {
   if (!activeCategory.value) return []
-  const usedInCategory = trainerStore.party[activeCategory.value]
+  const usedInCategory = trainerStore.party[activeCategory.value] || []
   return umaStore.unlockedUmas.filter((uma) => !usedInCategory.includes(uma.id))
 })
 
@@ -51,8 +57,72 @@ function getUma(id) {
 }
 </script>
 
-<template v-if="umaId && getUma(umaId)">
-  <TrainerCard :uma="getUma(umaId)" @remove="clearSlot(category.key, slotIndex)" />
+<template>
+  <div class="party-page">
+    <h1>Party</h1>
+    <p class="subtitle">Build a squad of up to 5 umas for each race distance.</p>
+
+    <div v-if="umaStore.unlockedUmas.length === 0" class="empty">
+      You don't have any unlocked umas yet. Visit the Gacha to recruit some!
+    </div>
+
+    <div v-else class="categories">
+      <section v-for="category in CATEGORIES" :key="category.key" class="category">
+        <h2>{{ category.label }}</h2>
+
+        <div class="slots">
+          <button
+            v-for="(umaId, slotIndex) in trainerStore.party[category.key] || []"
+            :key="slotIndex"
+            class="slot"
+            :class="{ filled: umaId }"
+            @click="
+              umaId ? clearSlot(category.key, slotIndex) : openPicker(category.key, slotIndex)
+            "
+          >
+            <template v-if="umaId && getUma(umaId)">
+              <TrainerCard :uma="getUma(umaId)" @remove="clearSlot(category.key, slotIndex)" />
+            </template>
+            <template v-else>
+              <span class="plus">+</span>
+              <span class="add-hint">Add Uma</span>
+            </template>
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Picker modal -->
+    <div v-if="pickerOpen" class="modal-overlay" @click.self="closePicker">
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Choose an Uma">
+        <header class="modal-header">
+          <h3>Choose an Uma</h3>
+          <button class="close-btn" @click="closePicker" aria-label="Close">&times;</button>
+        </header>
+
+        <div v-if="pickerOptions.length === 0" class="empty">
+          No available umas — all your unlocked umas are already in this category.
+        </div>
+
+        <div v-else class="modal-grid">
+          <button
+            v-for="uma in pickerOptions"
+            :key="uma.id"
+            class="modal-option"
+            @click="selectUma(uma.id)"
+          >
+            <img :src="uma.image_url" :alt="uma.name" class="portrait" />
+            <span class="uma-name">{{ uma.name }}</span>
+            <div class="stars">
+              <span v-for="n in 3" :key="n" class="star" :class="{ filled: n <= uma.rarity }"
+                >★</span
+              >
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
@@ -147,18 +217,6 @@ function getUma(id) {
   color: #2b2540;
 }
 
-.remove-hint {
-  font-size: 0.7rem;
-  color: #c0392b;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.slot.filled:hover .remove-hint {
-  opacity: 1;
-}
-
-/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -227,11 +285,9 @@ function getUma(id) {
 .stars {
   font-size: 0.85rem;
 }
-
 .star {
   color: #d8d4ea;
 }
-
 .star.filled {
   color: #f1c40f;
 }
