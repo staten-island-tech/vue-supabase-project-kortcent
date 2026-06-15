@@ -20,8 +20,7 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
       this.loading = true
       try {
-        const cleanUsername = username.trim().toLowerCase()
-
+        const cleanUsername = username.trim().toLowerCase().split('@')[0]
         if (!cleanUsername || !password) {
           this.error = 'Username and password are required.'
           return false
