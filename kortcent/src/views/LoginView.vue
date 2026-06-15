@@ -11,6 +11,7 @@ const password = ref('')
 const submitting = ref(false)
 
 async function handleSubmit() {
+  auth.error = null
   submitting.value = true
   const success = await auth.login(username.value, password.value)
   submitting.value = false

@@ -14,61 +14,61 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
   },
   {
     path: '/login',
     name: 'login',
-    component: LoginView
+    component: LoginView,
   },
   {
     path: '/register',
     name: 'register',
-    component: RegisterView
+    component: RegisterView,
   },
   {
     path: '/profile',
     name: 'profile',
     component: ProfileView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/umas',
     name: 'umas',
     component: UmasView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/umas/:id',
     name: 'uma-detail',
     component: UmaDetailView,
     meta: { requiresAuth: true },
-    props: true
+    props: true,
   },
   {
     path: '/party',
     name: 'party',
     component: TrainersView,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: '/gacha',
     name: 'gacha',
     component: GachaView,
-    meta: { requiresAuth: true }
-  }
+    meta: { requiresAuth: true },
+  },
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 })
 
 router.beforeEach((to, from, next) => {
   const auth = useAuthStore()
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
-    next({ name: 'home' })
+    next({ name: 'login' })
   } else if ((to.name === 'login' || to.name === 'register') && auth.isLoggedIn) {
     next({ name: 'profile' })
   } else {

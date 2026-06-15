@@ -2,6 +2,17 @@
 import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUmaStore } from '@/stores/umaStore'
+import { onMounted, computed, ref } from 'vue'
+
+const searchQuery = ref('')
+const searchError = ref(null)
+
+const filteredUmas = computed(() => {
+  if (!searchQuery.value.trim()) return umaStore.allUmas
+  return umaStore.allUmas.filter((u) =>
+    u.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+})
 
 const umaStore = useUmaStore()
 const router = useRouter()
@@ -25,11 +36,21 @@ function isUnlocked(id) {
     <h1>Uma Gallery</h1>
     <p class="subtitle">All Umamusume available on the Global server.</p>
 
+    <div class="search-bar">
+      <input
+        v-model="searchQuery"
+        type="search"
+        placeholder="Search umas..."
+        aria-label="Search umas"
+      />
+      <p v-if="searchError" class="error">{{ searchError }}</p>
+    </div>
+
     <div v-if="umaStore.loading" class="loading">Loading umas...</div>
 
     <div v-else class="grid">
       <button
-        v-for="uma in umaStore.allUmas"
+        v-for="uma in filteredUmas"
         :key="uma.id"
         class="card"
         :class="{ locked: !isUnlocked(uma.id) }"
@@ -83,7 +104,9 @@ function isUnlocked(id) {
   text-align: center;
   cursor: pointer;
   position: relative;
-  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.15s ease;
   font-family: inherit;
 }
 

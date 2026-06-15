@@ -5,21 +5,9 @@
 
     <!-- Pull Buttons -->
     <section class="pull-buttons" aria-label="Gacha pull options">
-      <button 
-        @click="doOnePull" 
-        :disabled="loading"
-        class="btn btn-single"
-      >
-        1 Pull
-      </button>
+      <button @click="doOnePull" :disabled="loading" class="btn btn-single">1 Pull</button>
 
-      <button 
-        @click="doTenPull" 
-        :disabled="loading"
-        class="btn btn-ten"
-      >
-        10 Pull
-      </button>
+      <button @click="doTenPull" :disabled="loading" class="btn btn-ten">10 Pull</button>
     </section>
 
     <!-- Error message -->
@@ -29,26 +17,18 @@
     <p v-if="loading" class="loading" aria-live="polite">Rolling...</p>
 
     <!-- Results -->
-    <section 
-      v-if="results.length > 0 && !loading" 
-      class="results-grid"
-      aria-label="Gacha results"
-    >
-      <article 
-        v-for="(uma, index) in results" 
+    <section v-if="results.length > 0 && !loading" class="results-grid" aria-label="Gacha results">
+      <article
+        v-for="(uma, index) in results"
         :key="index"
         class="uma-card"
         :class="`rarity-${uma.rarity}`"
       >
-        <img 
-          :src="uma.image_url" 
-          :alt="uma.name"
-          class="uma-image"
-        />
+        <img :src="uma.image_url" :alt="uma.name" class="uma-image" />
         <h2 class="uma-name">{{ uma.name }}</h2>
 
         <!-- Rarity stars using array method -->
-        <p class="stars" aria-label="`${uma.rarity} stars`">
+        <p class="stars" :aria-label="`${uma.rarity} stars`">
           {{ '⭐'.repeat(uma.rarity) }}
         </p>
 
@@ -67,20 +47,20 @@ import { ref } from 'vue'
 import { useUmaStore } from '@/stores/umaStore'
 import { useAuthStore } from '@/stores/authStore'
 
-const umaStore  = useUmaStore()
+const umaStore = useUmaStore()
 const authStore = useAuthStore()
 
 const results = ref([])
 const loading = ref(false)
-const error   = ref(null)
+const error = ref(null)
 
 async function doOnePull() {
-  error.value   = null
+  error.value = null
   loading.value = true
   results.value = []
 
   try {
-    const uma = await umaStore.onePull(authStore.user.id)
+    const uma = await umaStore.pullOne(authStore.user.id)
     if (!uma) throw new Error('No umas found in the database.')
     results.value = [uma]
   } catch (e) {
@@ -91,12 +71,12 @@ async function doOnePull() {
 }
 
 async function doTenPull() {
-  error.value   = null
+  error.value = null
   loading.value = true
   results.value = []
 
   try {
-    const umas = await umaStore.tenPull(authStore.user.id)
+    const umas = await umaStore.pullTen(authStore.user.id)
     if (!umas.length) throw new Error('No umas returned.')
     results.value = umas
   } catch (e) {
@@ -128,11 +108,22 @@ async function doTenPull() {
   cursor: pointer;
   transition: transform 0.1s;
 }
-.btn:hover:not(:disabled) { transform: scale(1.05); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-.btn-single { background: #6c63ff; color: white; }
-.btn-ten    { background: #f5a623; color: white; }
+.btn-single {
+  background: #6c63ff;
+  color: white;
+}
+.btn-ten {
+  background: #f5a623;
+  color: white;
+}
 
 .results-grid {
   display: grid;
@@ -150,9 +141,18 @@ async function doTenPull() {
 }
 
 /* Highlight rarity tiers */
-.rarity-3 { border-color: gold;   background: #2a2000; }
-.rarity-2 { border-color: silver; background: #1a1a2a; }
-.rarity-1 { border-color: #888;   background: #1e1e1e; }
+.rarity-3 {
+  border-color: gold;
+  background: #2a2000;
+}
+.rarity-2 {
+  border-color: silver;
+  background: #1a1a2a;
+}
+.rarity-1 {
+  border-color: #888;
+  background: #1e1e1e;
+}
 
 .uma-image {
   width: 100%;
@@ -161,17 +161,33 @@ async function doTenPull() {
   border-radius: 8px;
 }
 
-.badge-new  { 
-  position: absolute; top: 8px; right: 8px;
-  background: #00c853; color: white;
-  padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;
+.badge-new {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #00c853;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
 }
-.badge-dupe { 
-  position: absolute; top: 8px; right: 8px;
-  background: #555; color: #ccc;
-  padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;
+.badge-dupe {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #555;
+  color: #ccc;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.75rem;
 }
 
-.error   { color: #ff5252; margin-top: 1rem; }
-.loading { color: #aaa; font-style: italic; }
+.error {
+  color: #ff5252;
+  margin-top: 1rem;
+}
+.loading {
+  color: #aaa;
+  font-style: italic;
+}
 </style>
