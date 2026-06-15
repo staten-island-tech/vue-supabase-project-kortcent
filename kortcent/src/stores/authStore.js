@@ -77,7 +77,7 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
       this.loading = true
       try {
-        const cleanUsername = username.trim().toLowerCase()
+        const cleanUsername = username.trim().toLowerCase().split('@')[0]
         const fakeEmail = `${cleanUsername}${EMAIL_DOMAIN}`
 
         const { data, error } = await supabase.auth.signInWithPassword({
