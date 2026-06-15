@@ -3,12 +3,18 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import { useAuthStore } from './stores/authStore'
 
-const pinia = createPinia()
+import './assets/main.css'
 
 const app = createApp(App)
 
-app.use(pinia)
+app.use(createPinia())
 app.use(router)
 
-app.mount('#app')
+// Restore an existing Supabase session (if any) before mounting,
+// so route guards see the correct auth state on first load.
+const authStore = useAuthStore()
+authStore.restoreSession().finally(() => {
+  app.mount('#app')
+})
