@@ -43,7 +43,6 @@ export const useTrainerStore = defineStore('trainer', {
       this.loading = false
     },
 
-    // Place (or replace) a uma in a slot. slotIndex is 0-based.
     async setSlot(category, slotIndex, umaId) {
       const auth = useAuthStore()
       if (!auth.user) return
@@ -81,8 +80,6 @@ export const useTrainerStore = defineStore('trainer', {
       if (error) this.error = error.message
     },
 
-    // Is this uma already placed somewhere in the party? Useful to
-    // prevent adding the same uma to multiple slots if you want that rule.
     isUmaInParty(umaId) {
       return PARTY_CATEGORIES.some((cat) =>
         this.party[cat].includes(umaId)

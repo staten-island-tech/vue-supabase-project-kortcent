@@ -26,7 +26,6 @@ export const useAuthStore = defineStore('auth', {
           return false
         }
 
-        // Make sure the username isn't already taken
         const { data: existing } = await supabase
           .from('profiles')
           .select('id')
@@ -107,7 +106,6 @@ export const useAuthStore = defineStore('auth', {
       this.username = null
     },
 
-    // Call this on app startup to restore an existing session
     async restoreSession() {
       const { data } = await supabase.auth.getSession()
       if (data.session?.user) {

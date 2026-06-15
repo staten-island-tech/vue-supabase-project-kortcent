@@ -3,20 +3,16 @@
     <h1>Gacha</h1>
     <p class="subtitle">Try your luck to unlock new Umas!</p>
 
-    <!-- Pull Buttons -->
     <section class="pull-buttons" aria-label="Gacha pull options">
       <button @click="doOnePull" :disabled="loading" class="btn btn-single">1 Pull</button>
 
       <button @click="doTenPull" :disabled="loading" class="btn btn-ten">10 Pull</button>
     </section>
 
-    <!-- Error message -->
     <p v-if="error" class="error" role="alert">{{ error }}</p>
 
-    <!-- Loading state -->
     <p v-if="loading" class="loading" aria-live="polite">Rolling...</p>
 
-    <!-- Results -->
     <section v-if="results.length > 0 && !loading" class="results-grid" aria-label="Gacha results">
       <article
         v-for="(uma, index) in results"
@@ -27,14 +23,12 @@
         <img :src="uma.image_url" :alt="uma.name" class="uma-image" />
         <h2 class="uma-name">{{ uma.name }}</h2>
 
-        <!-- Rarity stars using array method -->
         <p class="stars" :aria-label="`${uma.rarity} stars`">
           {{ '⭐'.repeat(uma.rarity) }}
         </p>
 
         <p class="running-style">{{ uma.running_style }}</p>
 
-        <!-- NEW badge for first-time unlocks -->
         <span v-if="uma.isNew" class="badge-new">NEW!</span>
         <span v-else class="badge-dupe">Duplicate</span>
       </article>

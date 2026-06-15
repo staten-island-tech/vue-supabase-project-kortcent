@@ -2,11 +2,11 @@ import { defineStore } from 'pinia'
 import { supabase } from '@/supabaseClient'
 import { useAuthStore } from './authStore'
 
-// 3-star umas are intentionally very rare
+
 const RARITY_RATES = {
-  3: 0.02, // 2%
-  2: 0.18, // 18%
-  1: 0.80  // 80%
+  3: 0.02, 
+  2: 0.18, 
+  1: 0.80  
 }
 
 function rollRarity() {
@@ -67,8 +67,6 @@ export const useUmaStore = defineStore('uma', {
       }
     },
 
-    // Saves an unlock to the DB. Returns true if it was newly unlocked,
-    // false if the player already had it (duplicate, not saved again).
     async unlockUma(umaId) {
       const auth = useAuthStore()
       if (!auth.user) return false

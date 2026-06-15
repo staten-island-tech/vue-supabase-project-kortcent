@@ -67,7 +67,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
 
-  // Make sure session is restored before checking
+
   if (!auth.user) {
     await auth.restoreSession()
   }

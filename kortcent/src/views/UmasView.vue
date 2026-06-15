@@ -11,8 +11,6 @@ const router = useRouter()
 const searchQuery = ref('')
 const searchError = ref(null)
 
-// Computed: filters the uma list based on search input
-// Returns all umas if search is blank
 const filteredUmas = computed(() => {
   searchError.value = null
   if (!searchQuery.value.trim()) return umaStore.allUmas
@@ -44,16 +42,14 @@ function isUnlocked(id) {
     <h1>Uma Gallery</h1>
     <p class="subtitle">All Umamusume available on the Global server.</p>
 
-    <!-- SearchBar component — v-model passes searchQuery as prop -->
     <SearchBar v-model="searchQuery" placeholder="Search umas..." />
 
-    <!-- Error shown when search returns no results -->
     <p v-if="searchError" class="error">{{ searchError }}</p>
 
     <div v-if="umaStore.loading" class="loading">Loading umas...</div>
 
     <div v-else class="grid">
-      <!-- UmaCard component — uma and unlocked passed as props from parent -->
+
       <UmaCard
         v-for="uma in filteredUmas"
         :key="uma.id"
