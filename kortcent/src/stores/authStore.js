@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/supabaseClient'
 
+const EMAIL_DOMAIN = '@umamusume.local'
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
