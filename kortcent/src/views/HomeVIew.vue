@@ -80,7 +80,9 @@ function goToProfile() {
   font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
-  transition: transform 0.1s ease, opacity 0.15s ease;
+  transition:
+    transform 0.1s ease,
+    opacity 0.15s ease;
 }
 
 .primary-btn {
