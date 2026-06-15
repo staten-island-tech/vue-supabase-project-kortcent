@@ -8,11 +8,11 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     username: null,
     loading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
-    isLoggedIn: (state) => !!state.user
+    isLoggedIn: (state) => !!state.user,
   },
 
   actions: {
@@ -20,8 +20,7 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
       this.loading = true
       try {
-        const cleanUsername = username.trim().toLowerCase()
-
+        const cleanUsername = username.trim().toLowerCase().split('@')[0]
         if (!cleanUsername || !password) {
           this.error = 'Username and password are required.'
           return false
@@ -42,7 +41,7 @@ export const useAuthStore = defineStore('auth', {
         const fakeEmail = `${cleanUsername}${EMAIL_DOMAIN}`
         const { data, error } = await supabase.auth.signUp({
           email: fakeEmail,
-          password
+          password,
         })
 
         if (error) {
@@ -78,12 +77,12 @@ export const useAuthStore = defineStore('auth', {
       this.error = null
       this.loading = true
       try {
-        const cleanUsername = username.trim().toLowerCase()
+        const cleanUsername = username.trim().toLowerCase().split('@')[0]
         const fakeEmail = `${cleanUsername}${EMAIL_DOMAIN}`
 
         const { data, error } = await supabase.auth.signInWithPassword({
           email: fakeEmail,
-          password
+          password,
         })
 
         if (error) {
@@ -120,6 +119,6 @@ export const useAuthStore = defineStore('auth', {
           .single()
         this.username = profile?.username ?? null
       }
-    }
-  }
+    },
+  },
 })

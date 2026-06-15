@@ -157,7 +157,7 @@ function openUma(id) {
 
 .locked-pill {
   background: #f0eefc;
-  color: #8a85a6;
+  color: #4a4560;
   font-weight: 600;
   font-size: 0.85rem;
   padding: 0.4rem 0.9rem;

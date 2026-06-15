@@ -64,8 +64,13 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const auth = useAuthStore()
+
+  // Make sure session is restored before checking
+  if (!auth.user) {
+    await auth.restoreSession()
+  }
 
   if (to.meta.requiresAuth && !auth.isLoggedIn) {
     next({ name: 'home' })

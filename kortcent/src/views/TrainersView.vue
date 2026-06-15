@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from 'vue'
 import { useUmaStore } from '@/stores/umaStore'
 import { useTrainerStore } from '@/stores/trainerStore'
+import TrainerCard from '@/components/TrainerCard.vue'
 
 const umaStore = useUmaStore()
 const trainerStore = useTrainerStore()
@@ -11,7 +12,7 @@ const CATEGORIES = [
   { key: 'dirt', label: 'Dirt' },
   { key: 'mile', label: 'Mile' },
   { key: 'medium', label: 'Medium' },
-  { key: 'long', label: 'Long' }
+  { key: 'long', label: 'Long' },
 ]
 
 onMounted(async () => {
@@ -20,7 +21,6 @@ onMounted(async () => {
   await trainerStore.fetchParty()
 })
 
-// --- Picker modal state ---
 const pickerOpen = ref(false)
 const activeCategory = ref(null)
 const activeSlotIndex = ref(null)
@@ -37,10 +37,9 @@ function closePicker() {
   activeSlotIndex.value = null
 }
 
-// Umas the player owns that aren't already placed in this category's other slots
 const pickerOptions = computed(() => {
   if (!activeCategory.value) return []
-  const usedInCategory = trainerStore.party[activeCategory.value]
+  const usedInCategory = trainerStore.party[activeCategory.value] || []
   return umaStore.unlockedUmas.filter((uma) => !usedInCategory.includes(uma.id))
 })
 
@@ -73,16 +72,16 @@ function getUma(id) {
 
         <div class="slots">
           <button
-            v-for="(umaId, slotIndex) in trainerStore.party[category.key]"
+            v-for="(umaId, slotIndex) in trainerStore.party[category.key] || []"
             :key="slotIndex"
             class="slot"
             :class="{ filled: umaId }"
-            @click="umaId ? clearSlot(category.key, slotIndex) : openPicker(category.key, slotIndex)"
+            @click="
+              umaId ? clearSlot(category.key, slotIndex) : openPicker(category.key, slotIndex)
+            "
           >
             <template v-if="umaId && getUma(umaId)">
-              <img :src="getUma(umaId).image_url" :alt="getUma(umaId).name" class="portrait" />
-              <span class="uma-name">{{ getUma(umaId).name }}</span>
-              <span class="remove-hint">Click to remove</span>
+              <TrainerCard :uma="getUma(umaId)" @remove="clearSlot(category.key, slotIndex)" />
             </template>
             <template v-else>
               <span class="plus">+</span>
@@ -95,14 +94,14 @@ function getUma(id) {
 
     <!-- Picker modal -->
     <div v-if="pickerOpen" class="modal-overlay" @click.self="closePicker">
-      <div class="modal">
+      <div class="modal" role="dialog" aria-modal="true" aria-label="Choose an Uma">
         <header class="modal-header">
           <h3>Choose an Uma</h3>
-          <button class="close-btn" @click="closePicker">&times;</button>
+          <button class="close-btn" @click="closePicker" aria-label="Close">&times;</button>
         </header>
 
         <div v-if="pickerOptions.length === 0" class="empty">
-          No available umas to add (all your unlocked umas are already placed in this category).
+          No available umas — all your unlocked umas are already in this category.
         </div>
 
         <div v-else class="modal-grid">
@@ -115,7 +114,9 @@ function getUma(id) {
             <img :src="uma.image_url" :alt="uma.name" class="portrait" />
             <span class="uma-name">{{ uma.name }}</span>
             <div class="stars">
-              <span v-for="n in 3" :key="n" class="star" :class="{ filled: n <= uma.rarity }">★</span>
+              <span v-for="n in 3" :key="n" class="star" :class="{ filled: n <= uma.rarity }"
+                >★</span
+              >
             </div>
           </button>
         </div>
@@ -176,7 +177,9 @@ function getUma(id) {
   font-family: inherit;
   padding: 0.75rem;
   text-align: center;
-  transition: border-color 0.15s ease, transform 0.1s ease;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .slot:hover {
@@ -214,18 +217,6 @@ function getUma(id) {
   color: #2b2540;
 }
 
-.remove-hint {
-  font-size: 0.7rem;
-  color: #c0392b;
-  opacity: 0;
-  transition: opacity 0.15s ease;
-}
-
-.slot.filled:hover .remove-hint {
-  opacity: 1;
-}
-
-/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -294,11 +285,9 @@ function getUma(id) {
 .stars {
   font-size: 0.85rem;
 }
-
 .star {
   color: #d8d4ea;
 }
-
 .star.filled {
   color: #f1c40f;
 }
