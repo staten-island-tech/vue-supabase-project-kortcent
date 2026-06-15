@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import { useUmaStore } from '@/stores/umaStore'
 import { onMounted, computed, ref } from 'vue'
+import UmaCard from '@/components/UmaCard.vue'
 
 const searchQuery = ref('')
 const searchError = ref(null)
@@ -35,6 +36,7 @@ function isUnlocked(id) {
     <h1>Uma Gallery</h1>
     <p class="subtitle">All Umamusume available on the Global server.</p>
 
+    <!-- Search -->
     <div class="search-bar">
       <input
         v-model="searchQuery"
@@ -42,30 +44,19 @@ function isUnlocked(id) {
         placeholder="Search umas..."
         aria-label="Search umas"
       />
-      <p v-if="searchError" class="error">{{ searchError }}</p>
     </div>
 
     <div v-if="umaStore.loading" class="loading">Loading umas...</div>
 
     <div v-else class="grid">
-      <button
+      <!-- Props passed from parent (UmasView) to child (UmaCard) -->
+      <UmaCard
         v-for="uma in filteredUmas"
         :key="uma.id"
-        class="card"
-        :class="{ locked: !isUnlocked(uma.id) }"
-        @click="openUma(uma.id)"
-      >
-        <img :src="uma.image_url" :alt="uma.name" class="portrait" />
-        <h3 class="name">{{ uma.name }}</h3>
-
-        <div class="stars">
-          <span v-for="n in 3" :key="n" class="star" :class="{ filled: n <= uma.rarity }">★</span>
-        </div>
-
-        <p class="style">{{ uma.running_style }}</p>
-
-        <span v-if="!isUnlocked(uma.id)" class="lock-badge">Locked</span>
-      </button>
+        :uma="uma"
+        :unlocked="isUnlocked(uma.id)"
+        @click="openUma"
+      />
     </div>
   </div>
 </template>
