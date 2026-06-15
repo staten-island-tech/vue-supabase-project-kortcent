@@ -1,18 +1,16 @@
 import { defineStore } from 'pinia'
 import { supabase } from '@/supabaseClient'
 
-const EMAIL_DOMAIN = '@umamusume.local'
-
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
     username: null,
     loading: false,
-    error: null
+    error: null,
   }),
 
   getters: {
-    isLoggedIn: (state) => !!state.user
+    isLoggedIn: (state) => !!state.user,
   },
 
   actions: {
@@ -42,7 +40,7 @@ export const useAuthStore = defineStore('auth', {
         const fakeEmail = `${cleanUsername}${EMAIL_DOMAIN}`
         const { data, error } = await supabase.auth.signUp({
           email: fakeEmail,
-          password
+          password,
         })
 
         if (error) {
@@ -83,7 +81,7 @@ export const useAuthStore = defineStore('auth', {
 
         const { data, error } = await supabase.auth.signInWithPassword({
           email: fakeEmail,
-          password
+          password,
         })
 
         if (error) {
@@ -120,6 +118,6 @@ export const useAuthStore = defineStore('auth', {
           .single()
         this.username = profile?.username ?? null
       }
-    }
-  }
+    },
+  },
 })
