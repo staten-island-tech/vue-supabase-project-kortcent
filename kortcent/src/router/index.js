@@ -1,22 +1,79 @@
-import { useAuthStore } from '@/stores/authStore'
 import { createRouter, createWebHistory } from 'vue-router'
-import { createClient } from '@supabase/supabase-js'
+import { useAuthStore } from '@/stores/authStore'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-
-export const supabase = createClient(supabaseUrl, supabaseKey)
+import HomeView from '@/views/HomeView.vue'
+import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import ProfileView from '@/views/ProfileView.vue'
+import UmasView from '@/views/UmasView.vue'
+import UmaDetailView from '@/views/UmaDetailView.vue'
+import TrainersView from '@/views/TrainersView.vue'
+import GachaView from '@/views/GachaView.vue'
 
 const routes = [
-  { path: '/', component: HomeView },
-  { path: '/login', component: LoginView },
-  { path: '/umas', component: UmasView, meta: { requiresAuth: true } },
-  { path: '/trainers', component: TrainersView, meta: { requiresAuth: true } },
-  { path: '/profile/:id', component: ProfileView, meta: { requiresAuth: true } },
+  {
+    path: '/',
+    name: 'home',
+    component: HomeView
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterView
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: ProfileView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/umas',
+    name: 'umas',
+    component: UmasView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/umas/:id',
+    name: 'uma-detail',
+    component: UmaDetailView,
+    meta: { requiresAuth: true },
+    props: true
+  },
+  {
+    path: '/party',
+    name: 'party',
+    component: TrainersView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/gacha',
+    name: 'gacha',
+    component: GachaView,
+    meta: { requiresAuth: true }
+  }
 ]
 
-router.beforeEach(async (to) => {
-  const auth = useAuthStore()
-  await auth.fetchUser()
-  if (to.meta.requiresAuth && !auth.isLoggedIn) return '/login'
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes
 })
+
+router.beforeEach((to, from, next) => {
+  const auth = useAuthStore()
+
+  if (to.meta.requiresAuth && !auth.isLoggedIn) {
+    next({ name: 'home' })
+  } else if ((to.name === 'login' || to.name === 'register') && auth.isLoggedIn) {
+    next({ name: 'profile' })
+  } else {
+    next()
+  }
+})
+
+export default router
